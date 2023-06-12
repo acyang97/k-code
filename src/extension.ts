@@ -96,6 +96,7 @@ class KpopSideBar implements vscode.WebviewViewProvider {
         }
       });
     });
+
     // now I need to handle the function of uploading an image
 
     webviewView.webview.options = {
