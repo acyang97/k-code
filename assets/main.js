@@ -25,6 +25,11 @@
       sendToExtensionCommand: "openFileDialogFrustrated",
       getFromExtensionCommand: "fileDialogResultFrustrated",
     },
+    {
+      className: ".reset-button",
+      sendToExtensionCommand: "resetButtonSend",
+      getFromExtensionCommand: "resetButtonGet",
+    },
   ];
 
   buttons.forEach((button) => {
@@ -39,7 +44,6 @@
       if (message.command === button.getFromExtensionCommand) {
         const fileUri = message.fileUri;
         if (fileUri) {
-          // Process the selected image file here
           console.log(fileUri);
         }
       }

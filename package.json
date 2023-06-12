@@ -15,13 +15,18 @@
     "ui",
     "workspace"
   ],
+  "webview": {
+    "assets": [
+      "assets/**"
+    ]
+  },
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "custom-activitybar",
-          "title": "In Your Face",
-          "icon": "assets/logo_bito.svg"
+          "title": "Kpop Recommender",
+          "icon": "assets/vibe-music-svgrepo-com.svg"
         }
       ]
     },
@@ -29,26 +34,16 @@
       "custom-activitybar": [
         {
           "type": "webview",
-          "id": "in-your-face.openview",
-          "name": "In Your Face",
-          "contextualTitle": "In Your Face"
+          "id": "kpop-recommender.openview",
+          "name": "Kpop Recommender",
+          "contextualTitle": "Kpop Recommender"
         }
       ]
     },
-    "configuration": {
-      "title": "InYourFace",
-      "properties": {
-        "InYourFace.error.usewarnings": {
-          "type": "boolean",
-          "default": false,
-          "description": "Should take in account warnings"
-        }
-      }
-    },
     "commands": [
       {
-        "command": "in-your-face.openview.focus",
-        "category": "In Your Face",
+        "command": "kpop-recommender.openview.focus",
+        "category": "Kpop Recommender",
         "title": "Open Sidebar",
         "icon": "$(clear-all)"
       }
@@ -66,16 +61,16 @@
     "files": "**/*.ts"
   },
   "devDependencies": {
-    "@types/vscode": "^1.79.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.2.5",
+    "@types/vscode": "^1.79.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-electron": "^2.3.2",
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^5.1.3",
-    "@vscode/test-electron": "^2.3.2"
+    "typescript": "^5.1.3"
   }
 }

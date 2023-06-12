@@ -6,12 +6,17 @@ export function getNumberOfErrors(): number {
     return 0;
   }
   const document = activeTextEditor.document;
-  let numberOfErrors = 0;
+  // get lines of code with error
+  const errorLines = new Set<number>();
 
   for (let diagnostic of vscode.languages.getDiagnostics(document.uri)) {
-    if (diagnostic.severity === 0) {
-      numberOfErrors++;
+    if (diagnostic.severity === vscode.DiagnosticSeverity.Error) {
+      const range = diagnostic.range;
+      for (let line = range.start.line; line <= range.end.line; line++) {
+        errorLines.add(line);
+      }
     }
   }
-  return numberOfErrors;
+
+  return errorLines.size;
 }

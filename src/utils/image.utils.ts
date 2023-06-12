@@ -1,3 +1,5 @@
+import * as vscode from "vscode";
+
 export enum Mood {
   HAPPY,
   FRUSTRATED,
@@ -13,3 +15,21 @@ export const getEmojiImageFileName = (mood: Mood): string => {
     return "frustrated-emoji.png";
   }
 };
+
+export async function encodeImageToBase64(
+  filePath: string
+): Promise<[string, string]> {
+  try {
+    const arr = filePath.split(".");
+    const extension = arr[arr.length - 1];
+    const selectedFilePath = filePath.replace("file://", "");
+    const fileUri = vscode.Uri.file(selectedFilePath);
+    const fileContent = await vscode.workspace.fs.readFile(fileUri);
+    const imageBuffer = Buffer.from(fileContent);
+    const base64Image = imageBuffer.toString("base64");
+    return [base64Image, extension];
+  } catch (error) {
+    console.error("Error encoding image:", error);
+    throw error;
+  }
+}

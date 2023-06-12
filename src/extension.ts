@@ -1,12 +1,16 @@
 "use strict";
 import * as vscode from "vscode";
-import { BUTTONS } from "./constants/Buttons.constants";
-import { getNonce } from "./utils/getNounce";
+import { BUTTONS, IButton } from "./constants/Buttons.constants";
+import { getNonce } from "./utils/getNonce";
 import { getNumberOfErrors } from "./utils/getNumberOfErrors";
-import { Mood, getEmojiImageFileName } from "./utils/image.utils";
+import {
+  Mood,
+  encodeImageToBase64,
+  getEmojiImageFileName,
+} from "./utils/image.utils";
 
 export function activate(context: vscode.ExtensionContext) {
-  const provider = new KpopSideBar(context.extensionUri);
+  const provider = new KpopSideBar(context.extensionUri, context);
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(KpopSideBar.viewType, provider)
@@ -14,11 +18,13 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 class KpopSideBar implements vscode.WebviewViewProvider {
-  public static readonly viewType = "in-your-face.openview";
-
+  public static readonly viewType = "kpop-recommender.openview";
   private _view?: vscode.WebviewView;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    private readonly extensionContext: vscode.ExtensionContext
+  ) {}
 
   private debounce(
     webviewView: vscode.WebviewView,
@@ -33,14 +39,15 @@ class KpopSideBar implements vscode.WebviewViewProvider {
       setTimeout(() => {
         let numberOfErrors = getNumberOfErrors();
         let mood = Mood.HAPPY;
-        if (numberOfErrors >= 10) {
+        if (numberOfErrors >= 5) {
           mood = Mood.FRUSTRATED;
         } else if (numberOfErrors > 0) {
           mood = Mood.MOODY;
         }
-        webviewView.webview.html = this.getHtmlContent(
+        webviewView.webview.html = this.getHtml(
           webviewView.webview,
-          getEmojiImageFileName(mood)
+          mood,
+          this.extensionContext
         );
         updating = false;
       }, 1000);
@@ -61,6 +68,39 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     }
   }
 
+  async uploadFile(button: IButton, webviewView: vscode.WebviewView) {
+    vscode.window
+      .showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        filters: {
+          Images: ["png", "jpg", "jpeg", "gif"],
+        },
+      })
+      .then(async (fileUri) => {
+        try {
+          const selectedFile =
+            fileUri && fileUri.length > 0 ? fileUri[0].toString() : "";
+          const [encoded, extension] = await encodeImageToBase64(selectedFile);
+          this.extensionContext.globalState.update(button.mood.toString(), [
+            encoded,
+            extension,
+          ]);
+          webviewView.webview.postMessage({
+            command: button.getFromExtensionCommand,
+            fileUri: selectedFile,
+          });
+          // if successful, show the new image
+          webviewView.webview.html = this.getHtml(
+            webviewView.webview,
+            button.mood,
+            this.extensionContext
+          );
+        } catch (error) {}
+      });
+  }
+
   resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext<unknown>,
@@ -69,61 +109,67 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     this._view = webviewView;
 
     BUTTONS.forEach((button) => {
-      // from gpt
-      webviewView.webview.onDidReceiveMessage((message) => {
+      webviewView.webview.onDidReceiveMessage(async (message) => {
         if (message.command === button.sendToExtensionCommand) {
-          // Open the file dialog and send the result back to the webview
-          vscode.window
-            .showOpenDialog({
-              canSelectFiles: true,
-              canSelectFolders: false,
-              canSelectMany: false,
-              filters: {
-                Images: ["png", "jpg", "jpeg", "gif"],
-              },
-            })
-            .then((fileUri) => {
-              const selectedFile =
-                fileUri && fileUri.length > 0 ? fileUri[0].toString() : "";
-              // Send the file dialog result back to the webview
-              // process the uri
-              console.log("selectedFile", selectedFile);
-              webviewView.webview.postMessage({
-                command: button.getFromExtensionCommand,
-                fileUri: selectedFile,
-              });
-            });
+          await this.uploadFile(button, webviewView);
         }
       });
     });
 
-    // now I need to handle the function of uploading an image
+    // Reset images
+    webviewView.webview.onDidReceiveMessage(async (message) => {
+      if (message.command === "resetButtonSend") {
+        this.extensionContext.globalState.update(
+          Mood.FRUSTRATED.toString(),
+          undefined
+        );
+        this.extensionContext.globalState.update(
+          Mood.HAPPY.toString(),
+          undefined
+        );
+        this.extensionContext.globalState.update(
+          Mood.MOODY.toString(),
+          undefined
+        );
+      }
+    });
 
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
     // default it to be happy
-    webviewView.webview.html = this.getHtmlContent(
+    webviewView.webview.html = this.getHtml(
       webviewView.webview,
-      getEmojiImageFileName(Mood.HAPPY)
+      Mood.HAPPY,
+      this.extensionContext
     );
     let updating = false;
-    // 3 cases that I need to keep track and update the number of errors and render the proper image
     this.debounce(webviewView, "onDidChangeTextDocument", updating);
     this.debounce(webviewView, "onDidChangeDiagnostics", updating);
     this.debounce(webviewView, "onDidOpenTextDocument", updating);
   }
 
-  private getHtmlContent(webview: vscode.Webview, fileName: string): string {
+  getHtml(
+    webview: vscode.Webview,
+    mood: Mood,
+    context: vscode.ExtensionContext
+  ): string {
+    let base64EncodedImage;
+    if (context.globalState.get(mood.toString())) {
+      base64EncodedImage = context.globalState.get(mood.toString()) as [
+        string,
+        string
+      ];
+    }
     const displayImage = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "assets", fileName)
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "assets",
+        getEmojiImageFileName(mood)
+      )
     );
-    console.log("displayImage", displayImage);
-    return this.getHtml(webview, displayImage);
-  }
 
-  getHtml(webview: vscode.Webview, displayImage: vscode.Uri) {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "assets", "main.js")
     );
@@ -137,39 +183,48 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     const styleMainUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "assets", "main.css")
     );
+
     const numberOfErrors = getNumberOfErrors();
 
-    // Usage example:
+    let toDisplay = base64EncodedImage
+      ? `data:image/${base64EncodedImage[1]};base64,${base64EncodedImage[0]}`
+      : displayImage;
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
+
+    const formatNumberOfErrorsString = `${numberOfErrors} ${
+      numberOfErrors === 1 ? "error" : "errors"
+    }`;
 
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <!-- Resolve this later, for now just allow all images -->
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
-        webview.cspSource
-      }; script-src 'nonce-${nonce}'; img-src *;">
+      <!-- Resolve this later, for now just allow all images
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; img-src 'self' data:;">
+      -->
 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-      <link href="${styleResetUri}" rel="stylesheet">
-      <link href="${styleVSCodeUri}" rel="stylesheet">
-      <link href="${styleMainUri}" rel="stylesheet">
+      <link nonce="${nonce}" href="${styleResetUri}" rel="stylesheet">
+      <link nonce="${nonce}" href="${styleVSCodeUri}" rel="stylesheet">
+      <link nonce="${nonce}" href="${styleMainUri}" rel="stylesheet">
 
       <title>Kpop Recommender</title>
     </head>
     <body>
-      <section>
-        <img src="${displayImage}">
-        <h2 class=${numberOfErrors ? "alarm" : ""}>
-          ${numberOfErrors} ${numberOfErrors === 1 ? "error" : "errors"}
-        </h2>
-      </section>
+      <div class="image-div">
+        <img src="${toDisplay}">
+        <div class="error-text-div">
+          <h2>
+            ${formatNumberOfErrorsString}
+          </h2>
+        </div>
+      </div>
       <button class="add-image-button-happy">Update Happy Image</button>
       <button class="add-image-button-moody">Update Moody Image</button>
       <button class="add-image-button-frustrated">Update Frustrated Image</button>
+      <button class="reset-button">Reset All Images</button>
       <script nonce="${nonce}" src="${scriptUri}"></script>
     </body>
     </html>`;
