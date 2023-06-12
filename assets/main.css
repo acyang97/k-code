@@ -2,47 +2,25 @@ body {
   background-color: transparent;
 }
 
-.color-list {
-  list-style: none;
-  padding: 0;
+section {
+  max-height: 100vh;
+  font-family: "Muli", sans-serif;
+  font-size: 1rem;
+  background-color: transparent;
+  display: grid;
+  grid-template-rows: min(calc(100% - 32px), 256px) 32px;
+  place-items: center;
 }
 
-.color-entry {
-  width: 100%;
-  display: flex;
-  margin-bottom: 0.4em;
-  border: 1px solid var(--vscode-input-border);
-}
-
-.color-preview {
-  width: 2em;
-  height: 2em;
-}
-
-.color-preview:hover {
-  outline: inset white;
-}
-
-.color-input {
-  display: block;
-  flex: 1;
-  width: 100%;
-  color: var(--vscode-input-foreground);
-  background-color: var(--vscode-input-background);
-  border: none;
-  padding: 0 0.6em;
-}
-
-.add-color-button {
-  display: block;
-  border: none;
-  margin: 0 auto;
+section img {
+  object-fit: contain;
 }
 
 .add-image-button-happy {
   display: block;
   border: none;
   margin: 0 auto;
+  margin-top: 10px;
   margin-bottom: 4px;
 }
 

@@ -1,15 +1,15 @@
-enum Mood {
+export enum Mood {
   HAPPY,
   FRUSTRATED,
   MOODY,
 }
 
-export const getEmojiImageIfNoImage = (mood: Mood): string => {
+export const getEmojiImageFileName = (mood: Mood): string => {
   if (mood === Mood.HAPPY) {
-    return "😊";
+    return "happy-emoji.png";
   } else if (mood === Mood.MOODY) {
-    return "😨";
+    return "moody-emoji.png";
   } else {
-    return "🤬";
+    return "frustrated-emoji.png";
   }
 };

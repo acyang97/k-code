@@ -45,22 +45,4 @@
       }
     });
   });
-  // // @ts-ignore
-  // document.querySelector(".add-image-button").addEventListener("click", () => {
-  //   // Send a message to the extension code to open the file dialog
-  //   vscode.postMessage({ command: "openFileDialog" });
-  // });
-
-  // // Receive messages from the extension code
-  // window.addEventListener("message", (event) => {
-  //   const message = event.data;
-  //   // Handle messages sent from the extension code
-  //   if (message.command === "fileDialogResult") {
-  //     const fileUri = message.fileUri;
-  //     if (fileUri) {
-  //       // Process the selected image file here
-  //       console.log(fileUri);
-  //     }
-  //   }
-  // });
 })();
