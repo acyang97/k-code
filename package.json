@@ -2,7 +2,7 @@
   "name": "k-code",
   "displayName": "K-Code - A Korean themed view to support you while coding",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.79.0"
   },
