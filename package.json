@@ -4,7 +4,12 @@
   "description": "",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.78.0"
+    "vscode": "^1.79.0"
+  },
+  "publisher": "acyang97",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acyang97/k-code"
   },
   "categories": [
     "Other"
