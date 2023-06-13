@@ -12,9 +12,9 @@ import {
 import { getRandomSongLink } from "./utils/songs.utils";
 
 export function activate(context: vscode.ExtensionContext) {
-  const provider = new KpopSideBar(context.extensionUri, context);
+  const provider = new KCodeSideBar(context.extensionUri, context);
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(KpopSideBar.viewType, provider, {
+    vscode.window.registerWebviewViewProvider(KCodeSideBar.viewType, provider, {
       webviewOptions: {
         retainContextWhenHidden: true,
       },
@@ -22,8 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-class KpopSideBar implements vscode.WebviewViewProvider {
-  public static readonly viewType = "kpop-recommender.openview";
+class KCodeSideBar implements vscode.WebviewViewProvider {
+  public static readonly viewType = "k-code.openview";
   private _view?: vscode.WebviewView;
 
   constructor(
@@ -125,7 +125,6 @@ class KpopSideBar implements vscode.WebviewViewProvider {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "assets")],
     };
-    console.log(webviewView.webview.cspSource);
     BUTTONS.forEach((button) => {
       webviewView.webview.onDidReceiveMessage(async (message) => {
         if (message.command === button.sendToExtensionCommand) {
@@ -228,7 +227,6 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     }
     const SONG = getRandomSongLink();
 
-    const cspSource = webview.cspSource;
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -242,7 +240,7 @@ class KpopSideBar implements vscode.WebviewViewProvider {
       <link href="${styleResetUri}" rel="stylesheet">
       <link href="${styleVSCodeUri}" rel="stylesheet">
       <link href="${styleMainUri}" rel="stylesheet">
-      <title>Kpop Recommender</title>
+      <title>K-Code</title>
     </head>
     <body>
       <div class="image-div">
