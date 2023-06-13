@@ -1,5 +1,8 @@
 # K-Code README
 
+<img width="1422" alt="demo1" src="https://github.com/acyang97/k-code/assets/59875458/c8c439e0-219e-486e-b1d0-fca9842bf20d">
+
+
 This is a vscode extension that makes use of vscode webview to open up a side bar that displays 3 different images according to the number of lines of code that contains errors in your current file. On default, 3 different emoji images will be shown, but this can be customized by uploading an image.
 
 ## Features
