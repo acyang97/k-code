@@ -7,13 +7,18 @@ import {
   Mood,
   encodeImageToBase64,
   getEmojiImageFileName,
+  getMood,
 } from "./utils/image.utils";
+import { getRandomSongLink } from "./utils/songs.utils";
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new KpopSideBar(context.extensionUri, context);
-
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(KpopSideBar.viewType, provider)
+    vscode.window.registerWebviewViewProvider(KpopSideBar.viewType, provider, {
+      webviewOptions: {
+        retainContextWhenHidden: true,
+      },
+    })
   );
 }
 
@@ -38,18 +43,12 @@ class KpopSideBar implements vscode.WebviewViewProvider {
       updating = true;
       setTimeout(() => {
         let numberOfErrors = getNumberOfErrors();
-        let mood = Mood.HAPPY;
-        if (numberOfErrors >= 5) {
-          mood = Mood.FRUSTRATED;
-        } else if (numberOfErrors > 0) {
-          mood = Mood.MOODY;
-        }
+        updating = false;
         webviewView.webview.html = this.getHtml(
           webviewView.webview,
-          mood,
+          getMood(numberOfErrors),
           this.extensionContext
         );
-        updating = false;
       }, 1000);
     };
 
@@ -94,12 +93,27 @@ class KpopSideBar implements vscode.WebviewViewProvider {
           // if successful, show the new image
           webviewView.webview.html = this.getHtml(
             webviewView.webview,
-            button.mood,
+            getMood(getNumberOfErrors()),
             this.extensionContext
           );
         } catch (error) {}
       });
   }
+
+  // private updateWebviewCSP(webview: vscode.Webview, cspSource: string) {
+  //   const cspMetaTag = `<meta http-equiv="Content-Security-Policy" content="${cspSource}">`;
+  //   const cspHeader = webview
+  //     .asWebviewUri(vscode.Uri.parse(""))
+  //     .with({ scheme: "vscode-resource" });
+  //   webview.html = webview.html.replace(
+  //     /<meta.*http-equiv=['"]Content-Security-Policy['"].*>/g,
+  //     cspMetaTag
+  //   );
+  //   webview.html = webview.html.replace(
+  //     /content=["'][^"']*["']/gi,
+  //     `content="${cspHeader}"`
+  //   );
+  // }
 
   resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -107,7 +121,11 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     token: vscode.CancellationToken
   ): void | Thenable<void> {
     this._view = webviewView;
-
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "assets")],
+    };
+    console.log(webviewView.webview.cspSource);
     BUTTONS.forEach((button) => {
       webviewView.webview.onDidReceiveMessage(async (message) => {
         if (message.command === button.sendToExtensionCommand) {
@@ -132,11 +150,17 @@ class KpopSideBar implements vscode.WebviewViewProvider {
           undefined
         );
       }
+      webviewView.webview.html = this.getHtml(
+        webviewView.webview,
+        getMood(getNumberOfErrors()),
+        this.extensionContext
+      );
     });
 
     webviewView.webview.options = {
+      ...webviewView.webview.options,
       enableScripts: true,
-      localResourceRoots: [this._extensionUri],
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "assets")],
     };
     // default it to be happy
     webviewView.webview.html = this.getHtml(
@@ -192,24 +216,32 @@ class KpopSideBar implements vscode.WebviewViewProvider {
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
 
-    const formatNumberOfErrorsString = `${numberOfErrors} ${
+    let formatNumberOfErrorsString = `${numberOfErrors} ${
       numberOfErrors === 1 ? "error" : "errors"
     }`;
+    if (mood === Mood.FRUSTRATED) {
+      formatNumberOfErrorsString += " 🤬🤬 씨발";
+    } else if (mood === Mood.MOODY) {
+      formatNumberOfErrorsString += " 😨😨 씨발";
+    } else {
+      formatNumberOfErrorsString += " 😊😊";
+    }
+    const SONG = getRandomSongLink();
 
+    const cspSource = webview.cspSource;
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <!-- Resolve this later, for now just allow all images
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; img-src 'self' data:;">
-      -->
-
+      <!--
+      Use a content security policy to only allow loading images from https or from our extension directory,
+      and only allow scripts that have a specific nonce.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'self' http://*.vscode-cdn.net 'unsafe-inline'; img-src ${webview.cspSource} https: data:; script-src ${webview.cspSource} 'nonce-${nonce}' ; frame-src ${webview.cspSource} https://open.spotify.com https://spotify.com">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-      <link nonce="${nonce}" href="${styleResetUri}" rel="stylesheet">
-      <link nonce="${nonce}" href="${styleVSCodeUri}" rel="stylesheet">
-      <link nonce="${nonce}" href="${styleMainUri}" rel="stylesheet">
-
+      <link href="${styleResetUri}" rel="stylesheet">
+      <link href="${styleVSCodeUri}" rel="stylesheet">
+      <link href="${styleMainUri}" rel="stylesheet">
       <title>Kpop Recommender</title>
     </head>
     <body>
@@ -225,7 +257,13 @@ class KpopSideBar implements vscode.WebviewViewProvider {
       <button class="add-image-button-moody">Update Moody Image</button>
       <button class="add-image-button-frustrated">Update Frustrated Image</button>
       <button class="reset-button">Reset All Images</button>
+      <div class="play-on-spotify-button-container">
+        <a class="play-on-spotify-button" href="${SONG}" target="_blank">
+          Play Random Song
+        </a>
+      </div>
       <script nonce="${nonce}" src="${scriptUri}"></script>
+      </div>
     </body>
     </html>`;
   }

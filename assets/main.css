@@ -21,6 +21,46 @@ body {
 
 .error-text-div {
   text-align: center;
-  margin-tip: 5px;
+  margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.spotify-text-div {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.spotify-button {
+  /* width: 100%; */
+  width: 100%;
+}
+.play-on-spotify-button-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.play-on-spotify-button {
+  color: #191414;
+  background-color: #1db954;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 400px;
+  text-decoration: none;
+  padding: 10px 10px 10px;
+  transition-property: background-color;
+  text-align: center;
+  border-width: 0;
+  letter-spacing: 2px;
+  width: 100%;
+  text-transform: uppercase;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.play-on-spotify-button:hover {
+  text-decoration: none;
+  color: #191414;
 }

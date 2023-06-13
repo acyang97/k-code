@@ -21,6 +21,9 @@
     ]
   },
   "contributes": {
+    "webview": {
+      "contentSecurityPolicy": "default-src 'none'; frame-src https://open.spotify.com/;"
+    },
     "viewsContainers": {
       "activitybar": [
         {

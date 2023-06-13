@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 
 export enum Mood {
-  HAPPY,
-  FRUSTRATED,
-  MOODY,
+  HAPPY = "Happy",
+  FRUSTRATED = "Frustrated",
+  MOODY = "Moody",
 }
 
 export const getEmojiImageFileName = (mood: Mood): string => {
@@ -33,3 +33,13 @@ export async function encodeImageToBase64(
     throw error;
   }
 }
+
+export const getMood = (numberOfErrors: number) => {
+  let mood = Mood.HAPPY;
+  if (numberOfErrors >= 5) {
+    mood = Mood.FRUSTRATED;
+  } else if (numberOfErrors > 0) {
+    mood = Mood.MOODY;
+  }
+  return mood;
+};
