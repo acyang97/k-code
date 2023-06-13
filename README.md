@@ -1,71 +1,37 @@
-# kpop-recommender README
+# K-Code README
 
-This is the README for your extension "kpop-recommender". After writing up a brief description, we recommend including the following sections.
+This is a vscode extension that makes use of vscode webview to open up a side bar that displays 3 different images according to the number of lines of code that contains errors in your current file. On default, 3 different emoji images will be shown, but this can be customized by uploading an image.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Upload Image
 
-For example if there is an image subfolder under your extension project workspace:
+After installation of the extension, you can upload an image using one of the buttons that can be seen in the side bar, namely `Update Happy Image`, `Update Moody Image` and `Update Frustrated Image`. Image formats of `png`, `jpg`, `jpeg` and `gif` are accepted. I personally recommend `gif`s as they are more fun! The respective images will then be rendered and show up according to the number of errors you have in your current file.
 
-\!\[feature X\]\(images/feature-x.png\)
+I understand that most of this feature technically allows you to add any image of your choice of any theme, but the ideas of this extension was to add a korean vibe and a little fun while coding. If you are a fellow kpop fan, I recommend that you find some funny kpop-related images and use it!
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Reset Images
+
+If you want to reset the images to the default emojis, simply click the `Reset All Images` button,
+
+### Play a random song
+
+Click the `Play Random Song` button to play a random korean song on spotify. It will recommend you a song to boost your productivity!
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+NA
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+NA
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Known issues will be listen down here
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of K-Code!

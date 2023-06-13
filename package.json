@@ -1,6 +1,6 @@
 {
-  "name": "kpop-recommender",
-  "displayName": "kpop-recommender",
+  "name": "k-code",
+  "displayName": "K-Code - A Korean themed view to support you while coding",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -28,7 +28,7 @@
       "activitybar": [
         {
           "id": "custom-activitybar",
-          "title": "Kpop Recommender",
+          "title": "K-Code",
           "icon": "assets/vibe-music-svgrepo-com.svg"
         }
       ]
@@ -37,16 +37,16 @@
       "custom-activitybar": [
         {
           "type": "webview",
-          "id": "kpop-recommender.openview",
-          "name": "Kpop Recommender",
-          "contextualTitle": "Kpop Recommender"
+          "id": "k-code.openview",
+          "name": "K-Code",
+          "contextualTitle": "K-Code"
         }
       ]
     },
     "commands": [
       {
-        "command": "kpop-recommender.openview.focus",
-        "category": "Kpop Recommender",
+        "command": "k-code.openview.focus",
+        "category": "K-Code",
         "title": "Open Sidebar",
         "icon": "$(clear-all)"
       }
