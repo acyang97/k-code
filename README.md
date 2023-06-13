@@ -8,6 +8,12 @@ This is a vscode extension that makes use of vscode webview to open up a side ba
 
 After installation of the extension, you can upload an image using one of the buttons that can be seen in the side bar, namely `Update Happy Image`, `Update Moody Image` and `Update Frustrated Image`. Image formats of `png`, `jpg`, `jpeg` and `gif` are accepted. I personally recommend `gif`s as they are more fun! The respective images will then be rendered and show up according to the number of errors you have in your current file.
 
+
+
+https://github.com/acyang97/k-code/assets/59875458/1ab47470-0764-4613-8645-4ac3dbaaf06d
+
+
+
 I understand that most of this feature technically allows you to add any image of your choice of any theme, but the ideas of this extension was to add a korean vibe and a little fun while coding. If you are a fellow kpop fan, I recommend that you find some funny kpop-related images and use it!
 
 ### Reset Images
